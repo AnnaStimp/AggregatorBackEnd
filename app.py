@@ -2,7 +2,7 @@ import psycopg2
 from flask import Flask, jsonify, g
 from flask_cors import CORS, cross_origin
 
-from model import host, user, password, db_name, get_new_product, get_category
+from model import host, user, password, db_name, get_new_product, get_category, get_product_of_category, get_product, get_products
 
 
 app = Flask(__name__)
@@ -37,6 +37,21 @@ def new_product():
 def category():
     with  get_db().cursor() as cursor:
         return jsonify(get_category(cursor))
+
+@app.route('/category/<category_id>', methods = ['GET'])
+def product_of_category(category_id):
+    with  get_db().cursor() as cursor:
+        return jsonify(get_product_of_category(cursor, category_id))
+
+@app.route('/product', methods = ['GET'])
+def products():
+    with  get_db().cursor() as cursor:
+        return jsonify(get_products(cursor))
+
+@app.route('/product/<product_id>', methods = ['GET'])
+def product(product_id):
+    with  get_db().cursor() as cursor:
+        return jsonify(get_product(cursor, product_id))
 
 @app.teardown_appcontext
 def close_connection(exception):
