@@ -1,10 +1,11 @@
+# данные для подключения к базе данных
 host = '127.0.0.1'
 user = 'postgres'
 password = 'AnnaStimp13'
 db_name = 'aggregator'
 port = 5432
     
-
+# функции для выполнения запросов к базе данных
 def get_new_product (cursor):
   cursor.execute(
     """SELECT product.id_product, product.name_product, product.about_product,
