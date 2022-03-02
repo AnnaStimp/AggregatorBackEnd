@@ -1,21 +1,21 @@
+# импорт необходимых библиотек
 from flask import request, json
-
 from app import app
 
-with app.test_client() as c:
+with app.test_client() as c:  #создание тестового клиента
     # положительный тест
-    rv = c.get('/category/2')
-    data = json.loads(rv.data)
-    status = rv.status_code
-    print('Результаты проведения положительного теста:\n', data, '\nСтатус ответа:', status)
-    assert status == 200
+    rv = c.get('/category/2') #выполнение запроса к тестовому клиенту
+    data = json.loads(rv.data) #преобразование полученных данных
+    status = rv.status_code #получение статуса запроса
+    print('Результаты проведения положительного теста:\n', data, '\nСтатус ответа:', status) #вывод данных
+    assert status == 200 #сравнение полученного статуса с тем, что ожидает тест
 
     # негативный тест
-    rv = c.get('/category/255')
-    data = json.loads(rv.data)
-    status = rv.status_code
-    print('Результаты проведения негативного теста:\n', data, '\nСтатус ответа:', status)
-    assert status == 404, 'При запросе к не существующему id категории, должен выдаваться статус 404'
+    rv = c.get('/category/255') #выполнение запроса к тестовому клиенту
+    data = json.loads(rv.data) #преобразование полученных данных
+    status = rv.status_code #получение статуса запроса
+    print('Результаты проведения негативного теста:\n', data, '\nСтатус ответа:', status) #вывод данных
+    assert status == 404, 'При запросе к не существующему id категории, должен выдаваться статус 404' #сравнение полученного статуса с тем, что ожидает тест
 
 
 
