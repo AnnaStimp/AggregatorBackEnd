@@ -30,28 +30,48 @@ def index():
 @cross_origin()
 def new_product():
     with  get_db().cursor() as cursor:
-        return jsonify(get_new_product(cursor))
+        response = get_new_product(cursor)
+        if len(response) == 0:
+            return page_not_found('Not found new products')
+
+        return jsonify(response)
 
 @app.route('/category', methods = ['GET']) # создание пути для получения данных о категориях
 @cross_origin()
 def category():
     with  get_db().cursor() as cursor:
-        return jsonify(get_category(cursor))
+        response = get_category(cursor)
+        if len(response) == 0:
+            return page_not_found('Not found categorys')
+            
+        return jsonify(response)
 
 @app.route('/category/<category_id>', methods = ['GET']) # создание пути для получения данных о товарах конркетной категории
 def product_of_category(category_id):
     with  get_db().cursor() as cursor:
-        return jsonify(get_product_of_category(cursor, category_id))
+        response = get_product_of_category(cursor, category_id)
+        if len(response) == 0:
+            return page_not_found(f'Not found products of category {category_id}')
+            
+        return jsonify(response)
 
 @app.route('/product', methods = ['GET']) # создание пути для получения всех id товаров
 def products():
     with  get_db().cursor() as cursor:
-        return jsonify(get_products(cursor))
+        response = get_products(cursor)
+        if len(response) == 0:
+            return page_not_found('Not found products')
+            
+        return jsonify(response)
 
 @app.route('/product/<product_id>', methods = ['GET']) # создание пути для получения данных о конкретном товаре
 def product(product_id):
     with  get_db().cursor() as cursor:
-        return jsonify(get_product(cursor, product_id))
+        response = get_product(cursor, product_id)
+        if len(response) == 0:
+            return page_not_found(f'Not found products {product_id}')
+            
+        return jsonify(response)
 
 @app.teardown_appcontext # функция, закрывающая базу данных, когда приложение перестает работать
 def close_connection(exception):
@@ -60,6 +80,9 @@ def close_connection(exception):
         db.close()
         print('close db')
 
+@app.errorhandler(404)
+def page_not_found(mes):
+    return {'status': 404, 'message': f'{mes}'}, 404
 
 if __name__ == "__main__":
     app.run(debug=True)
