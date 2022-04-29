@@ -65,3 +65,12 @@ def get_users (cursor):
   )
 
   return cursor.fetchall()
+
+def insert_product (cursor, name, about, url, id_category):
+  cursor.execute(
+    """INSERT INTO product (name_product, about_product, picture_product, id_category)
+        VALUES ('{}', '{}', '{}', {})
+        RETURNING id_product;""".format(name, about, url, id_category)
+  )
+
+  return cursor.fetchall()
