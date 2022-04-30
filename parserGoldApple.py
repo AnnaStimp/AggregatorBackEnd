@@ -1,19 +1,23 @@
-from ast import Str
 import psycopg2
 import requests
 import json
 
-from model import host, user, password, db_name, insert_product
+from model import host, user, password, db_name, insert_product, insert_price_list
 
 categoryId = {
-    'makeup': 3,
-    'care': 4,
-    'pharmacy': 3747,
-    'hair': 6,
-    'asia': 10,
-    'organic': 12,
-    'perfumer': 7
+    'makeup': {'req': 3, 'db': 2},
+    'care': {'req': 4, 'db': 1},
+    'pharmacy': {'req': 3747, 'db': 3},
+    'hair': {'req': 6, 'db': 4},
+    'asia': {'req': 10, 'db': 5},
+    'organic': {'req': 12, 'db': 6},
+    'perfumer': {'req': 7, 'db': 7}
 }
+
+id_store = 1
+
+HEADERS = {'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Mobile Safari/537.36',
+           'accept': '*/*'}
 
 def get_db():
     db = psycopg2.connect(
@@ -24,37 +28,37 @@ def get_db():
     )
     return db
 
-url = 'https://goldapple.ru/web_scripts/discover/category/products?cat=3&page=1'
-
-headers = {'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Mobile Safari/537.36',
-           'accept': '*/*'}
-
-r = requests.get(url, headers=headers)
-pr = json.loads(r.text)['products']
-
 db = get_db()
 
-for i in pr:
-    with  db.cursor() as cursor:
-        name = str(i['brand']).upper() + str(i['name']).lower()
-        response = insert_product(cursor, name, i['category_type'], i['url'], 2)
-        db.commit()
-        print(response[0][0])
+for category in categoryId:
+    page = 1
+    cat = categoryId[category]['req']
 
+    url = 'https://goldapple.ru/web_scripts/discover/category/products?cat={}&page={}'.format(cat, page)
+    r = requests.get(url, headers=HEADERS)
+    result_of_req = json.loads(r.text)
 
+    while 'products' in result_of_req.keys():
+        products = result_of_req['products']
 
+        for i in products:
+            with  db.cursor() as cursor:
+                name = '{} {}'.format(str(i['brand']).upper().replace(r"'", ""), str(i['name']).lower().replace(r"'", ""))
+                response = insert_product(cursor, name, i['category_type'], i['webp_image_url'], categoryId[category]['db'])
+                db.commit()
 
+                if response[0][0]:
+                    response = insert_price_list(cursor, response[0][0], id_store, i['url'], i['price'])
+                    db.commit()
+        
+        page+=1
+        url = 'https://goldapple.ru/web_scripts/discover/category/products?cat={}&page={}'.format(cat, page)
+        r = requests.get(url, headers=HEADERS)
+        result_of_req = json.loads(r.text)
 
+print('end')
 
-
-
-
-
-
-
-
-
-import requests
+# import requests
 # from bs4 import BeautifulSoup
 
 # url = 'https://goldapple.ru/uhod'

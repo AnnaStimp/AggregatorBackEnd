@@ -74,3 +74,11 @@ def insert_product (cursor, name, about, url, id_category):
   )
 
   return cursor.fetchall()
+
+def insert_price_list (cursor, id_product, id_store, link_product, price):
+  cursor.execute(
+    """INSERT INTO price_list (id_product, id_store, link_product, price)
+        VALUES ({}, {}, '{}', {});""".format(id_product, id_store, link_product, price)
+  )
+
+  return cursor.statusmessage
