@@ -14,7 +14,7 @@ def get_new_product (cursor):
     ON product.ID_product = price_list.ID_product
     GROUP BY product.name_product, product.about_product, picture_product, product.id_product
     ORDER BY product.id_product DESC
-    limit 4"""
+    limit 16"""
   )
 
   return cursor.fetchall()
@@ -66,11 +66,11 @@ def get_users (cursor):
 
   return cursor.fetchall()
 
-def insert_product (cursor, name, about, url, id_category):
+def insert_product (cursor, name, about, url, volume, id_category):
   cursor.execute(
-    """INSERT INTO product (name_product, about_product, picture_product, id_category)
-        VALUES ('{}', '{}', '{}', {})
-        RETURNING id_product;""".format(name, about, url, id_category)
+    """INSERT INTO product (name_product, about_product, picture_product, volume, id_category)
+        VALUES ('{}', '{}', '{}', '{}', {})
+        RETURNING id_product;""".format(name, about, url, volume, id_category)
   )
 
   return cursor.fetchall()

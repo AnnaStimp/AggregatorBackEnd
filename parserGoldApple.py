@@ -1,6 +1,7 @@
 import psycopg2
 import requests
 import json
+import time
 
 from model import host, user, password, db_name, insert_product, insert_price_list
 
@@ -39,12 +40,14 @@ for category in categoryId:
     result_of_req = json.loads(r.text)
 
     while 'products' in result_of_req.keys():
+    # count = 0
+    # while count != 2:
         products = result_of_req['products']
 
         for i in products:
             with  db.cursor() as cursor:
                 name = '{} {}'.format(str(i['brand']).upper().replace(r"'", ""), str(i['name']).lower().replace(r"'", ""))
-                response = insert_product(cursor, name, i['category_type'], i['webp_image_url'], categoryId[category]['db'])
+                response = insert_product(cursor, name, i['category_type'], i['webp_image_url'], (i['volume'] or 0), categoryId[category]['db'])
                 db.commit()
 
                 if response[0][0]:
@@ -52,36 +55,10 @@ for category in categoryId:
                     db.commit()
         
         page+=1
+        time.sleep(5)
         url = 'https://goldapple.ru/web_scripts/discover/category/products?cat={}&page={}'.format(cat, page)
         r = requests.get(url, headers=HEADERS)
         result_of_req = json.loads(r.text)
+        # count += 1
 
-print('end')
-
-# import requests
-# from bs4 import BeautifulSoup
-
-# url = 'https://goldapple.ru/uhod'
-
-# headers = {'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Mobile Safari/537.36',
-#            'accept': '*/*'}
-
-# def get_html(url, params=None):
-#     r = requests.get(url, headers=headers, params=params)
-#     return r
-
-# def get_content(html):
-#     # print(html)
-#     soup = BeautifulSoup(html, 'html.parser')
-#     items = soup.find_all(class_='catalog-products')
-#     print(items)
-
-# def parser():
-#     html = get_html(url)
-#     if html.status_code == 200:
-#         get_content(html.text)
-#     else:
-#         'ere'
-
-
-# parser()
+print('end pars GoldApple')
