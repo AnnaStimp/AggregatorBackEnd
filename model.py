@@ -30,7 +30,7 @@ def get_category (cursor):
 def get_product_of_category (cursor, id):
   cursor.execute(
     """SELECT product.id_category, product.id_product, product.name_product, product.about_product,
-    MIN(price) AS price, picture_product
+    MIN(price) AS price, picture_product, viewing
     FROM price_list INNER JOIN product
     ON product.ID_product = price_list.ID_product
     WHERE product.id_category = {}
@@ -79,6 +79,15 @@ def insert_price_list (cursor, id_product, id_store, link_product, price):
   cursor.execute(
     """INSERT INTO price_list (id_product, id_store, link_product, price)
         VALUES ({}, {}, '{}', {});""".format(id_product, id_store, link_product, price)
+  )
+
+  return cursor.statusmessage
+
+def product_viewing (cursor, id_product):
+  cursor.execute(
+    """UPDATE product
+      SET viewing = viewing+1 
+      WHERE id_product = {};""".format(id_product)
   )
 
   return cursor.statusmessage

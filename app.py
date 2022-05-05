@@ -1,8 +1,8 @@
 import psycopg2
-from flask import Flask, jsonify, g
+from flask import Flask, jsonify, g, request
 from flask_cors import CORS, cross_origin
 
-from model import host, user, password, db_name, get_new_product, get_category, get_product_of_category, get_product, get_products
+from model import host, user, password, db_name, get_new_product, get_category, get_product_of_category, get_product, get_products, product_viewing
 
 
 app = Flask(__name__)
@@ -72,6 +72,22 @@ def product(product_id):
             return page_not_found(f'Not found products {product_id}')
             
         return jsonify(response)
+
+@app.route('/product_viewing', methods = ['POST']) # создание пути для отправки данных о просмотре товара
+def productViewing():
+    id_product = None
+    db = get_db()
+
+    try:
+        id_product = request.get_json()['id_product']
+    except:
+        return 'error'
+
+    with  db.cursor() as cursor:
+        product_viewing(cursor, id_product)
+        print(id_product)
+        db.commit()
+        return 'OK'
 
 @app.teardown_appcontext # функция, закрывающая базу данных, когда приложение перестает работать
 def close_connection(exception):
