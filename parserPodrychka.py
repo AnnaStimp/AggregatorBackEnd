@@ -9,6 +9,7 @@ HEADERS = {'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N)
            'accept': '*/*'}
 HOST = 'https://www.podrygka.ru'
 
+# подключение к базе данных
 def get_db():
     db = psycopg2.connect(
         host=host,
@@ -20,6 +21,7 @@ def get_db():
 
 db = get_db()
 
+# указание категорий товаров для базы данных и запросов
 categoryId = {
     'makeup': {'req': 'makiyazh', 'db': 2},
     'care': {'req': 'ukhod', 'db': 1},
@@ -30,11 +32,13 @@ categoryId = {
 
 id_store = 2
 
+# функция для выполнения запроса
 def get_html(cat, page):
     url = 'https://www.podrygka.ru/catalog/{}?PAGEN_1={}'.format(cat, page)
     r = requests.get(url, headers=HEADERS)
     return r
 
+# функция для получения данных о продуктах
 def get_content(html):
     soup = BeautifulSoup(html, 'html.parser')
     items = soup.find_all('div', class_='item-product-card')
@@ -65,7 +69,7 @@ def get_content(html):
 
     return products
 
-
+# функция-парсер
 def parser(cat, page):
     html = get_html(cat, page)
     if html.status_code == 200:
@@ -73,6 +77,7 @@ def parser(cat, page):
     else:
         return 404
 
+# функция для отправки данных в базу данных
 def add_to_db(products, cat_id):
     with  db.cursor() as cursor:
 
@@ -84,18 +89,15 @@ def add_to_db(products, cat_id):
                 response = insert_price_list(cursor, response[0][0], id_store, product['url'], product['price'])
                 db.commit()
     
-
-
+# добавление товаров по категориям в базу данных
 for category in categoryId:
     page = 1
     cat = categoryId[category]['req']
-    # count = 0
+
     while True:
-    # while count != 10:
         time.sleep(5)
         res = parser(cat, page)
         if res == 404:
             break
         add_to_db(res, categoryId[category]['db'])
         page += 1
-        # count+=1
