@@ -1,10 +1,13 @@
+# импорт библиотек
 import psycopg2
 from flask import Flask, jsonify, g, request
 from flask_cors import CORS, cross_origin
 
+# импорт функций и переменных
 from model import host, user, password, db_name, get_new_product, get_category, get_product_of_category, get_product, get_products, product_viewing
 
 
+# создание приложение и настройка политики
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -30,10 +33,12 @@ def index():
 @cross_origin()
 def new_product():
     with  get_db().cursor() as cursor:
+        # выполнение запроса к бд
         response = get_new_product(cursor)
         if len(response) == 0:
             return page_not_found('Not found new products')
-
+        
+        # если ответ был получен, возвращение данных
         return jsonify(response)
 
 @app.route('/category', methods = ['GET']) # создание пути для получения данных о категориях
@@ -85,7 +90,6 @@ def productViewing():
 
     with  db.cursor() as cursor: # если в запросе пришел корректно id продукта, то добавляется просмотр в базу данных
         product_viewing(cursor, id_product)
-        print(id_product)
         db.commit()
         return 'OK'
 
@@ -96,7 +100,7 @@ def close_connection(exception):
         db.close()
         print('close db')
 
-@app.errorhandler(404)
+@app.errorhandler(404) # при происхождении ошибки 404, возвращать сообщение о ошибке
 def page_not_found(mes):
     return {'status': 404, 'message': f'{mes}'}, 404
 
