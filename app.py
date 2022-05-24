@@ -24,12 +24,12 @@ def get_db():
         )
     return db
 
-@app.route('/', methods = ['GET']) # создание базового пути
+@app.route('/api', methods = ['GET']) # создание базового пути
 @cross_origin()
 def index():
     return jsonify('hi dear')
 
-@app.route('/new-product', methods = ['GET']) # создание пути для получения данных о новинках
+@app.route('/api/new-product', methods = ['GET']) # создание пути для получения данных о новинках
 @cross_origin()
 def new_product():
     with  get_db().cursor() as cursor:
@@ -41,7 +41,7 @@ def new_product():
         # если ответ был получен, возвращение данных
         return jsonify(response)
 
-@app.route('/category', methods = ['GET']) # создание пути для получения данных о категориях
+@app.route('/api/category', methods = ['GET']) # создание пути для получения данных о категориях
 @cross_origin()
 def category():
     with  get_db().cursor() as cursor:
@@ -51,7 +51,7 @@ def category():
             
         return jsonify(response)
 
-@app.route('/category/<category_id>', methods = ['GET']) # создание пути для получения данных о товарах конркетной категории
+@app.route('/api/category/<category_id>', methods = ['GET']) # создание пути для получения данных о товарах конркетной категории
 def product_of_category(category_id):
     with  get_db().cursor() as cursor:
         response = get_product_of_category(cursor, category_id)
@@ -60,7 +60,7 @@ def product_of_category(category_id):
             
         return jsonify(response)
 
-@app.route('/product', methods = ['GET']) # создание пути для получения всех id товаров
+@app.route('/api/product', methods = ['GET']) # создание пути для получения всех id товаров
 def products():
     with  get_db().cursor() as cursor:
         response = get_products(cursor)
@@ -69,7 +69,7 @@ def products():
             
         return jsonify(response)
 
-@app.route('/product/<product_id>', methods = ['GET']) # создание пути для получения данных о конкретном товаре
+@app.route('/api/product/<product_id>', methods = ['GET']) # создание пути для получения данных о конкретном товаре
 def product(product_id):
     with  get_db().cursor() as cursor:
         response = get_product(cursor, product_id)
@@ -78,7 +78,7 @@ def product(product_id):
             
         return jsonify(response)
 
-@app.route('/product_viewing', methods = ['POST']) # создание пути для отправки данных о просмотре товара
+@app.route('/api/product_viewing', methods = ['POST']) # создание пути для отправки данных о просмотре товара
 def productViewing():
     id_product = None
     db = get_db()
