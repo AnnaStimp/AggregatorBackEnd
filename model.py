@@ -9,7 +9,7 @@ port = 5432
 def get_new_product (cursor):
   cursor.execute(
     """SELECT product.id_product, product.name_product, product.about_product,
-    MIN(price) AS price, picture_product
+    MIN(price)::money::numeric::float8 AS price, picture_product
     FROM price_list INNER JOIN product
     ON product.ID_product = price_list.ID_product
     GROUP BY product.name_product, product.about_product, picture_product, product.id_product
@@ -32,7 +32,7 @@ def get_category (cursor):
 def get_product_of_category (cursor, id):
   cursor.execute(
     """SELECT product.id_category, product.id_product, product.name_product, product.about_product,
-    MIN(price) AS price, picture_product, viewing
+    MIN(price)::money::numeric::float8 AS price, picture_product, viewing
     FROM price_list INNER JOIN product
     ON product.ID_product = price_list.ID_product
     WHERE product.id_category = {}
@@ -44,7 +44,7 @@ def get_product_of_category (cursor, id):
 # функция для получения информации о товаре из базы данных
 def get_product (cursor, id):
   cursor.execute(
-    """SELECT product.id_product, product.name_product, store.name_store, product.about_product, price, link_product, picture_product
+    """SELECT product.id_product, product.name_product, store.name_store, product.about_product, price::money::numeric::float8, link_product, picture_product
     FROM price_list INNER JOIN product 
     ON product.id_product = price_list.id_product INNER JOIN store
     ON store.id_store = price_list.id_store
