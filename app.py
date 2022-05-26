@@ -87,7 +87,8 @@ def productViewing():
         id_product = request.get_json()['id_product']
     except:
         return 'error'
-
+    
+    print(id_product)
     with  db.cursor() as cursor: # если в запросе пришел корректно id продукта, то добавляется просмотр в базу данных
         product_viewing(cursor, id_product)
         db.commit()
